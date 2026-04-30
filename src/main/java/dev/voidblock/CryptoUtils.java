@@ -1,5 +1,8 @@
 package dev.voidblock;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 public class CryptoUtils {
@@ -57,4 +60,27 @@ public class CryptoUtils {
         }
         return result;
     }
+
+    public static String saltsEncryption(byte[] data, int amount) {
+        List<Integer> positions = new ArrayList<>();
+        for (int i = 0; i < data.length; i++) {
+            positions.add(i);
+        }
+        Collections.shuffle(positions);
+
+        StringBuilder saltInfo = new StringBuilder();
+        Random rand = new Random();
+
+        for (int i = 0; i < amount; i++) {
+            int pos = positions.get(i);
+            byte originalByte = data[pos];
+
+            // %03d for the byte (0-255), %04d for the position
+            saltInfo.append(String.format("%03d%04d", (originalByte & 0xFF), pos));
+            // Overwrite a byte in the text with a random byte
+            data[pos] = (byte) rand.nextInt(256);
+        }
+        return saltInfo.toString();
+    }
+
 }

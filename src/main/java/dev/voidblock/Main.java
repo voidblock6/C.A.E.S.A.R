@@ -31,6 +31,7 @@ public class Main {
                 String generatedKey = CryptoUtils.generateRandomKey(32);
                 String config = "";
                 String ceasarShift = "00";
+                String saltAmount = "0";
 
                 System.out.println("input which encryption steps do you want to use \n ----------------");
 
@@ -45,6 +46,15 @@ public class Main {
                 if (ceasar.equals("y")) {
                      ceasarShift = encryptionNumberQuestion(scanner, "what shift for Ceasar chiper", 1, 26, 2);
                 }
+
+                String salts = encryptionQuestions(scanner, "Encryptions with salts?");
+                if (salts.equals("y")) {
+                    int maxSaltPossible = Math.min(text.length(), 32);
+                    saltAmount = encryptionNumberQuestion(scanner, "how many salts", 1, maxSaltPossible, 2);
+                }
+
+
+                //config
                 if (XOR.equals("y")) {
                     config += "X";
                 } else {
@@ -63,6 +73,14 @@ public class Main {
                     config += "___";
                 }
 
+
+                //salts is always last config parts
+                if (salts.equals("y")) {
+                    config += "S" + saltAmount;
+                } else {
+                    config += "_";
+                }
+
                 byte[] encryptedRaw = input.getBytes(StandardCharsets.UTF_8);
                 byte[] keyBytes = generatedKey.getBytes(StandardCharsets.UTF_8);
 
@@ -78,12 +96,15 @@ public class Main {
                     }
 
                     if (ceasar.equals("y")) {
-                        encryptedRaw = CryptoUtils.vigenereEncryption(encryptedRaw, keyBytes);
+                        encryptedRaw = CryptoUtils.ceasarEncryption(encryptedRaw, Integer.parseInt(ceasarShift));
                     }
 
                         encryptionRoundsInt--;
                 }
 
+                if (salts.equals("y")) {
+                    CryptoUtils.saltsEncryption(encryptedRaw, Integer.parseInt(saltAmount));
+                }
                 // base64 conversion for easy copy
                 String base64Result = Base64.getEncoder().encodeToString(encryptedRaw);
 
@@ -101,7 +122,7 @@ public class Main {
 
                 // DECRYPTION MODE
                 System.out.print("Input the Base64 message: ");
-                String base64Input = scanner.nextLine().trim(); // .trim() prevetn crashes because of spaces
+                String base64Input = scanner.nextLine().trim(); // .trim() prevents crashes because of spaces
 
                 System.out.print("Input the key: ");
                 String keyInput = scanner.nextLine();
