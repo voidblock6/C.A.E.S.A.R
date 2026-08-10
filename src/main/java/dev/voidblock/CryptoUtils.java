@@ -61,6 +61,8 @@ public class CryptoUtils {
         return result;
     }
 
+
+    //salts encryption
     public static String saltsEncryption(byte[] data, int amount) {
         List<Integer> positions = new ArrayList<>();
         for (int i = 0; i < data.length; i++) {
@@ -82,5 +84,4 @@ public class CryptoUtils {
         }
         return saltInfo.toString();
     }
-
 }
