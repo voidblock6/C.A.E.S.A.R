@@ -85,7 +85,7 @@ public class CryptoUtils {
                 data = CryptoUtils.ceasarEncryption(data, ceasarShift);
                 ceasarRounds--;
                 roundsLeft--;
-                operationOrder.add("C" + ceasarShift);
+                operationOrder.add("C" + String.format("%03d", ceasarShift));
             }
         }
         String result = Base64.getEncoder().encodeToString(data);
