@@ -1,9 +1,6 @@
 package dev.voidblock;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class CryptoUtils {
 
@@ -22,10 +19,12 @@ public class CryptoUtils {
     public static byte[] XOREncryption(byte[] data, byte[] key) {
         byte[] result = new byte[data.length];
 
-        for (int i = 0; i < data.length; i++) {
-            //XORs the next charachter of the text with the next charachter of the key
-            result[i] = (byte) (data[i] ^ key[i % key.length]);
-        }
+
+            for (int i = 0; i < data.length; i++) {
+                //XORs the next charachter of the text with the next charachter of the key
+                result[i] = (byte) (data[i] ^ key[i % key.length]);
+            }
+
         return result;
     }
 
@@ -61,8 +60,43 @@ public class CryptoUtils {
         return result;
     }
 
+    public static EncryptionResult encrypt(byte[] data, byte[] key, int xorRounds, int vignereRounds, int ceasarRounds, int ceasarShift) {
+        List<String> operationOrder = new ArrayList<>();
+        int roundsLeft = xorRounds + vignereRounds + ceasarRounds;
+
+        while(roundsLeft > 0) {
+
+            if (xorRounds > 0) {
+                data = CryptoUtils.XOREncryption(data, key);
+                xorRounds--;
+                roundsLeft--;
+                operationOrder.add("X");
+
+            }
+
+            if (vignereRounds > 0) {
+                data = CryptoUtils.vigenereEncryption(data, key);
+                vignereRounds--;
+                roundsLeft--;
+                operationOrder.add("V");
+            }
+
+            if (ceasarRounds > 0) {
+                data = CryptoUtils.ceasarEncryption(data, ceasarShift);
+                ceasarRounds--;
+                roundsLeft--;
+                operationOrder.add("C" + ceasarShift);
+            }
+        }
+        String result = Base64.getEncoder().encodeToString(data);
+       return new EncryptionResult(result, operationOrder);
+    }
+
+
+
 
     //salts encryption
+    /*
     public static String saltsEncryption(byte[] data, int amount) {
         List<Integer> positions = new ArrayList<>();
         for (int i = 0; i < data.length; i++) {
@@ -84,4 +118,19 @@ public class CryptoUtils {
         }
         return saltInfo.toString();
     }
+
+     */
+
+
+    public static class EncryptionResult {
+        public String data;
+        public List<String> operationOrder;
+
+        public EncryptionResult(String data, List<String> operationOrder) {
+            this.data = data;
+            this.operationOrder = operationOrder;
+        }
+    }
 }
+
+

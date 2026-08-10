@@ -102,9 +102,7 @@ public class Main {
                         encryptionRoundsInt--;
                 }
 
-                if (salts.equals("y")) {
-                    CryptoUtils.saltsEncryption(encryptedRaw, Integer.parseInt(saltAmount));
-                }
+
                 // base64 conversion for easy copy
                 String base64Result = Base64.getEncoder().encodeToString(encryptedRaw);
 
