@@ -3,7 +3,7 @@ package dev.voidblock;
 import javax.swing.*;
 import java.awt.*;
 
-public class UIUTILS {
+public class UiUtils {
 
     public static void toggleVisibilityOnCheck(JCheckBox trigger, Component... targets) {
         // hide all targets initially

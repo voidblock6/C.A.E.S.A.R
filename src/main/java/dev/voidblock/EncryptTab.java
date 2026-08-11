@@ -2,17 +2,15 @@ package dev.voidblock;
 import javax.swing.*;
 import java.awt.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 
 import static dev.voidblock.CryptoUtils.encrypt;
+import static dev.voidblock.UiUtils.toggleVisibilityOnCheck;
 
 
-public class UI {
-        public static void main(String[] args) {
-            JFrame frame = new JFrame("C.E.A.S.A.R.");
-            frame.setSize(700, 450);
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setLayout(new BorderLayout());
+public class EncryptTab {
+    public static JPanel build() {
+        JPanel encryptPanel = new JPanel(new BorderLayout());
+            encryptPanel.setLayout(new BorderLayout());
 
             // input and output fields
             JTextArea inputField = new JTextArea(5, 30);
@@ -114,21 +112,21 @@ public class UI {
             // text areas
             JPanel textPanel = new JPanel(new GridLayout(1, 3, 10, 0));
 
-            
+
 
             //input box
             JPanel inputWrapper = new JPanel(new BorderLayout());
-            inputWrapper.add(new JLabel("Input:"), BorderLayout.NORTH);
+            inputWrapper.add(new JLabel("Plaintext Input:"), BorderLayout.NORTH);
             inputWrapper.add(new JScrollPane(inputField), BorderLayout.CENTER);
 
             //output field
             JPanel outputWrapper = new JPanel(new BorderLayout());
-            outputWrapper.add(new JLabel("Output:"), BorderLayout.NORTH);
+            outputWrapper.add(new JLabel("Encrypted Output:"), BorderLayout.NORTH);
             outputWrapper.add(new JScrollPane(outputField), BorderLayout.CENTER);
 
             //config field
             JPanel configOutputWrapper = new JPanel(new BorderLayout());
-            configOutputWrapper.add(new JLabel("Config:"), BorderLayout.NORTH);
+            configOutputWrapper.add(new JLabel("Your Config:"), BorderLayout.NORTH);
             configOutputWrapper.add(new JScrollPane(configOutputField), BorderLayout.CENTER);
 
             //key field
@@ -142,29 +140,18 @@ public class UI {
             configKeyPanel.add(configOutputWrapper);
 
             textPanel.add(inputWrapper);
-            textPanel.add(outputWrapper);
             textPanel.add(configKeyPanel);
+            textPanel.add(outputWrapper);
+
             //assemble
-            frame.add(controlsPanel, BorderLayout.NORTH);
-            frame.add(textPanel, BorderLayout.CENTER);
+            encryptPanel.add(controlsPanel, BorderLayout.NORTH);
+            encryptPanel.add(textPanel, BorderLayout.CENTER);
 
-            frame.setVisible(true);
+
+
+            return encryptPanel;
         }
 
-        public static void toggleVisibilityOnCheck(JCheckBox trigger, Component... targets) {
-            for (Component target : targets) {
-                target.setVisible(false);
-            }
-
-            trigger.addActionListener(e -> {
-                boolean enabled = trigger.isSelected();
-                for (Component target : targets) {
-                    target.setVisible(enabled);
-                }
-                trigger.getParent().revalidate();
-                trigger.getParent().repaint();
-            });
-        }
     }
 
 
