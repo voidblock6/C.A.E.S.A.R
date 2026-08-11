@@ -17,10 +17,18 @@ public class EncryptTab {
             JTextArea outputField = new JTextArea(5, 30);
             JTextArea configOutputField = new JTextArea(5,30);
             JTextArea keyOutputField = new JTextArea(5,30);
+            JTextArea consoleOutputField = new JTextArea(5,30);
             outputField.setEditable(false);
             configOutputField.setEditable(false);
             keyOutputField.setEditable(false);
+            consoleOutputField.setEditable(false);
 
+            consoleOutputField.append("CryptoUtils loaded.. \n"  );
+            consoleOutputField.append("Encryption Editor UI loaded.. \n" );
+            consoleOutputField.append("C.E.A.S.A.R. startup finished! \n");
+
+
+            //XOR
             JCheckBox xorEncryptionToggle = new JCheckBox("Enable XOR Encryption");
 
             JLabel xorRoundsLabel = new JLabel("XOR Rounds:");
@@ -32,6 +40,7 @@ public class EncryptTab {
 
             JCheckBox vignereEncryptionToggle = new JCheckBox("Enable Vignére Encryption");
 
+            //Vignére
             JLabel vignereRoundsLabel = new JLabel("Vignére Rounds:");
             JSlider vignereRoundsSlider = new JSlider(1, 10, 1);
             vignereRoundsSlider.setMajorTickSpacing(1);
@@ -39,18 +48,34 @@ public class EncryptTab {
             vignereRoundsSlider.setPaintLabels(true);
             toggleVisibilityOnCheck(vignereEncryptionToggle, vignereRoundsLabel, vignereRoundsSlider);
 
-            JCheckBox ceasarEncryptionToggle = new JCheckBox("Enable Ceasar Chiper Encryption");
+            //Caesar
+            JCheckBox caesarEncryptionToggle = new JCheckBox("Enable Caesar Chiper Encryption");
 
-            JLabel ceasarShiftLabel = new JLabel("Caesar Shift (1-225):");
+            JLabel caesarShiftLabel = new JLabel("Caesar Shift (1-225):");
 
-            JSlider ceasarRoundsSlider = new JSlider(1, 10, 1);
-            ceasarRoundsSlider.setMajorTickSpacing(1);
-            ceasarRoundsSlider.setPaintTicks(true);
-            ceasarRoundsSlider.setPaintLabels(true);
+            JSlider caesarRoundsSlider = new JSlider(1, 10, 1);
+            caesarRoundsSlider.setMajorTickSpacing(1);
+            caesarRoundsSlider.setPaintTicks(true);
+            caesarRoundsSlider.setPaintLabels(true);
             SpinnerNumberModel shiftModel = new SpinnerNumberModel(1, 1, 255, 1);
-            JSpinner ceasarShiftSpinner = new JSpinner(shiftModel);
+            JSpinner caesarShiftSpinner = new JSpinner(shiftModel);
 
-            toggleVisibilityOnCheck(ceasarEncryptionToggle, ceasarShiftSpinner, ceasarShiftLabel, ceasarRoundsSlider);
+           toggleVisibilityOnCheck(caesarEncryptionToggle, caesarShiftSpinner, caesarShiftLabel, caesarRoundsSlider);
+
+
+           //Key length
+           JLabel keyLengthLabel = new JLabel("Key Length (8-64): 32");
+
+           JSlider keyLengthSlider = new JSlider(8, 64, 32);
+           keyLengthSlider.setMajorTickSpacing(2);
+           keyLengthSlider.setPaintTicks(true);
+           keyLengthSlider.setPaintLabels(true);
+
+        keyLengthSlider.addChangeListener(e -> {
+            keyLengthLabel.setText("Key Length (8-64): " + keyLengthSlider.getValue());
+        });
+
+
 
             //encryption
 
@@ -58,7 +83,7 @@ public class EncryptTab {
             runButton.addActionListener(e -> {
 
                 //key generation
-                String generatedKey = CryptoUtils.generateRandomKey(32);
+                String generatedKey = CryptoUtils.generateRandomKey(keyLengthSlider.getValue());
                 byte[] keyBytes = generatedKey.getBytes(StandardCharsets.UTF_8);
 
 
@@ -78,15 +103,15 @@ public class EncryptTab {
                     vignereRounds = 0;
                 }
 
-                int ceasarRounds;
-                if (ceasarEncryptionToggle.isSelected()) {
-                    ceasarRounds = ceasarRoundsSlider.getValue();
+                int caesarRounds;
+                if (caesarEncryptionToggle.isSelected()) {
+                    caesarRounds = caesarRoundsSlider.getValue();
                 } else {
-                    ceasarRounds = 0;
+                    caesarRounds = 0;
                 }
 
-                int shift = (int) ceasarShiftSpinner.getValue();
-                CryptoUtils.EncryptionResult result = encrypt(encryptedRaw, keyBytes, xorRounds, vignereRounds, ceasarRounds, shift);
+                int shift = (int) caesarShiftSpinner.getValue();
+                CryptoUtils.EncryptionResult result = encrypt(encryptedRaw, keyBytes, xorRounds, vignereRounds, caesarRounds, shift);
                 String finalData = result.data;
                 String config = String.join("", result.operationOrder);
 
@@ -103,16 +128,14 @@ public class EncryptTab {
             controlsPanel.add(vignereEncryptionToggle);
             controlsPanel.add(vignereRoundsLabel);
             controlsPanel.add(vignereRoundsSlider);
-            controlsPanel.add(ceasarEncryptionToggle);
-            controlsPanel.add(ceasarRoundsSlider);
-            controlsPanel.add(ceasarShiftLabel);
-            controlsPanel.add(ceasarShiftSpinner);
+            controlsPanel.add(caesarEncryptionToggle);
+            controlsPanel.add(caesarRoundsSlider);
+            controlsPanel.add(caesarShiftLabel);
+            controlsPanel.add(caesarShiftSpinner);
             controlsPanel.add(runButton);
 
             // text areas
             JPanel textPanel = new JPanel(new GridLayout(1, 3, 10, 0));
-
-
 
             //input box
             JPanel inputWrapper = new JPanel(new BorderLayout());
@@ -126,21 +149,30 @@ public class EncryptTab {
 
             //config field
             JPanel configOutputWrapper = new JPanel(new BorderLayout());
-            configOutputWrapper.add(new JLabel("Your Config:"), BorderLayout.NORTH);
+            configOutputWrapper.add(new JLabel("Config Output:"), BorderLayout.NORTH);
             configOutputWrapper.add(new JScrollPane(configOutputField), BorderLayout.CENTER);
 
             //key field
             JPanel keyOutputWrapper = new JPanel(new BorderLayout());
-            keyOutputWrapper.add(new JLabel("de/encryption key:"), BorderLayout.NORTH);
+            keyOutputWrapper.add(new JLabel("De/Encryption key:"), BorderLayout.NORTH);
             keyOutputWrapper.add(new JScrollPane(keyOutputField), BorderLayout.CENTER);
 
-            JPanel configKeyPanel = new JPanel();
-            configKeyPanel.setLayout(new BoxLayout(configKeyPanel, BoxLayout.Y_AXIS));
-            configKeyPanel.add(keyOutputWrapper);
-            configKeyPanel.add(configOutputWrapper);
+            //console field
+        JPanel consoleOutputWrapper = new JPanel(new BorderLayout());
+        consoleOutputWrapper.add(new JLabel("Console messages:"), BorderLayout.NORTH);
+        consoleOutputWrapper.add(new JScrollPane(consoleOutputField), BorderLayout.CENTER);
+
+
+        JPanel configKeyConsolePanel = new JPanel();
+            configKeyConsolePanel.setLayout(new BoxLayout(configKeyConsolePanel, BoxLayout.Y_AXIS));
+            configKeyConsolePanel.add(keyLengthLabel);
+            configKeyConsolePanel.add(keyLengthSlider);
+            configKeyConsolePanel.add(keyOutputWrapper);
+            configKeyConsolePanel.add(configOutputWrapper);
+            configKeyConsolePanel.add(consoleOutputWrapper);
 
             textPanel.add(inputWrapper);
-            textPanel.add(configKeyPanel);
+            textPanel.add(configKeyConsolePanel);
             textPanel.add(outputWrapper);
 
             //assemble
