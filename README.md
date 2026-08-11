@@ -39,7 +39,7 @@ This project is very much still a work in progress.
 ## Questions and suggestions
 Feel free to suggest new features or ask questions in my Discord: https://discord.gg/7Cjdrp2FDX
 
-
+Note: A Windows executable (.exe) and a runnable .jar will be released once more features are complete. If you want to test the program right now, run the project directly inside an IDE (e.g., IntelliJ IDEA).
 
 
 
