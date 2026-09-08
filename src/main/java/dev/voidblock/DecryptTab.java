@@ -2,9 +2,12 @@ package dev.voidblock;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.*;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import static dev.voidblock.CryptoUtils.encrypt;
+import static dev.voidblock.CryptoUtils.parseConfig;
 import static dev.voidblock.UiUtils.toggleVisibilityOnCheck;
 
 public class DecryptTab {
@@ -29,6 +32,11 @@ public class DecryptTab {
 
         JButton runButton = new JButton("Decrypt");
         runButton.addActionListener(e -> {
+            consoleOutputField.append("\nConfig detected: " + configInputField.getText() + "\n" );
+            List<String> parsedConfig = parseConfig(configInputField.getText());
+            consoleOutputField.append("Config parsed: " + parsedConfig + "\n");
+            Collections.reverse(parsedConfig);
+            consoleOutputField.append("Config reversed: " + parsedConfig + "\n");
 
         });
 

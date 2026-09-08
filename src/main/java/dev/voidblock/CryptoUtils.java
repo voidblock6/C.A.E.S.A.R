@@ -1,5 +1,6 @@
 package dev.voidblock;
 
+import java.lang.management.OperatingSystemMXBean;
 import java.util.*;
 
 public class CryptoUtils {
@@ -91,6 +92,28 @@ public class CryptoUtils {
         String result = Base64.getEncoder().encodeToString(data);
        return new EncryptionResult(result, operationOrder);
     }
+
+    public static List<String> parseConfig(String config) {
+        List<String> operationOrder = new ArrayList<>();
+        int i = 0;
+
+        while (i < config.length()) {
+            char current = config.charAt(i);
+
+            if (current == 'C') {
+                String shiftDigits = config.substring(i + 1, i + 4);
+                operationOrder.add("C" + shiftDigits);
+                i += 4;
+
+            } else {
+                operationOrder.add(String.valueOf(current));
+                i += 1;
+            }
+        }
+
+        return operationOrder;
+    }
+
 
 
 
