@@ -3,12 +3,11 @@ package dev.voidblock;
 import javax.swing.*;
 import java.awt.*;
 import java.util.*;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import static dev.voidblock.CryptoUtils.encrypt;
+import static dev.voidblock.CryptoUtils.decrypt;
 import static dev.voidblock.CryptoUtils.parseConfig;
-import static dev.voidblock.UiUtils.toggleVisibilityOnCheck;
+
 
 public class DecryptTab {
     public static JPanel build() {
@@ -32,11 +31,17 @@ public class DecryptTab {
 
         JButton runButton = new JButton("Decrypt");
         runButton.addActionListener(e -> {
+            consoleOutputField.setText("");
+
             consoleOutputField.append("\nConfig detected: " + configInputField.getText() + "\n" );
             List<String> parsedConfig = parseConfig(configInputField.getText());
             consoleOutputField.append("Config parsed: " + parsedConfig + "\n");
             Collections.reverse(parsedConfig);
             consoleOutputField.append("Config reversed: " + parsedConfig + "\n");
+
+            String reversedKey = new StringBuilder(keyInputField.getText()).reverse().toString();
+            consoleOutputField.append("\nKey detected: [ "  + keyInputField.getText() + " ]\n");
+            consoleOutputField.append("Key reversed: [ " + reversedKey + " ]");
 
         });
 

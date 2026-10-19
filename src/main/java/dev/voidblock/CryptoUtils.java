@@ -93,27 +93,6 @@ public class CryptoUtils {
        return new EncryptionResult(result, operationOrder);
     }
 
-    public static List<String> parseConfig(String config) {
-        List<String> operationOrder = new ArrayList<>();
-        int i = 0;
-
-        while (i < config.length()) {
-            char current = config.charAt(i);
-
-            if (current == 'C') {
-                String shiftDigits = config.substring(i + 1, i + 4);
-                operationOrder.add("C" + shiftDigits);
-                i += 4;
-
-            } else {
-                operationOrder.add(String.valueOf(current));
-                i += 1;
-            }
-        }
-
-        return operationOrder;
-    }
-
 
 
 
@@ -154,6 +133,62 @@ public class CryptoUtils {
             this.operationOrder = operationOrder;
         }
     }
-}
 
+    // decryption
+    public static List<String> parseConfig(String config) {
+        List<String> operationOrder = new ArrayList<>();
+        int i = 0;
+
+        while (i < config.length()) {
+            char current = config.charAt(i);
+
+            if (current == 'C') {
+                String shiftDigits = config.substring(i + 1, i + 4);
+                operationOrder.add("C" + shiftDigits);
+                i += 4;
+
+            } else {
+                operationOrder.add(String.valueOf(current));
+                i += 1;
+            }
+        }
+
+        return operationOrder;
+    }
+
+
+    public static String decrypt(byte[] data, byte[] key, int xorRounds, int vignereRounds, int ceasarRounds, int ceasarShift) {
+        List<String> operationOrder = new ArrayList<>();
+        int roundsLeft = xorRounds + vignereRounds + ceasarRounds;
+        data = Base64.getDecoder().decode(data);
+
+        while(roundsLeft > 0) {
+
+            if (ceasarRounds > 0) {
+                data = CryptoUtils.ceasarEncryption(data, ceasarShift);
+                ceasarRounds--;
+                roundsLeft--;
+
+            }
+
+            if (vignereRounds > 0) {
+                data = CryptoUtils.vigenereEncryption(data, key);
+                vignereRounds--;
+                roundsLeft--;
+
+            }
+
+            if (xorRounds > 0) {
+                data = CryptoUtils.XOREncryption(data, key);
+                xorRounds--;
+                roundsLeft--;
+
+            }
+
+        }
+
+        String result = data.toString();
+        return result;
+    }
+}
 
