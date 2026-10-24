@@ -39,9 +39,8 @@ public class DecryptTab {
             Collections.reverse(parsedConfig);
             consoleOutputField.append("Config reversed: " + parsedConfig + "\n");
 
-            String reversedKey = new StringBuilder(keyInputField.getText()).reverse().toString();
-            consoleOutputField.append("\nKey detected: [ "  + keyInputField.getText() + " ]\n");
-            consoleOutputField.append("Key reversed: [ " + reversedKey + " ]");
+            String result = CryptoUtils.decrypt(encryptedTextInputField.getText(), keyInputField.getText(), parsedConfig);
+            decryptedTextOutputField.setText(result);
 
         });
 

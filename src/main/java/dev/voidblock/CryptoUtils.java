@@ -1,6 +1,7 @@
 package dev.voidblock;
 
 import java.lang.management.OperatingSystemMXBean;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class CryptoUtils {
@@ -157,37 +158,67 @@ public class CryptoUtils {
     }
 
 
-    public static String decrypt(byte[] data, byte[] key, int xorRounds, int vignereRounds, int ceasarRounds, int ceasarShift) {
+    public static byte[] ceasarDecryption(byte[] data, int shift) {
+        byte[] result = new byte[data.length];
+        for (int i = 0; i < data.length; i++) {
+            int val = data[i] & 0xFF;
+            // apply the shift (max 256 for ascii)
+            int shifted = (val - shift) % 256;
+            result[i] = (byte) shifted;
+        }
+        return result;
+    }
+
+    public static byte[] vigenereDecryption(byte[] data, byte[] key) {
+        byte[] result = new byte[data.length];
+
+        for (int i = 0; i < data.length; i++) {
+            // Gets the current charachter from the input text
+            byte inputByte = data[i];
+            // Picks a key character, repeating the key if it's shorter than the text
+            byte keyByte = key[i % key.length];
+            // Uses the ASCII value of the key character as the shift amount
+            int shift = (int) keyByte;
+            // Shift the input character by adding the key's ASCII value
+            byte encryptedByte = (byte) (inputByte - shift); //encrypts the char by adding the ascii value of the keys char
+            //add encrypted char to the result
+            result[i] = encryptedByte;
+        }
+        // give back result as a string
+        return result;
+    }
+
+
+
+
+    public static String decrypt(String sData, String sKey, List<String> config) {
         List<String> operationOrder = new ArrayList<>();
-        int roundsLeft = xorRounds + vignereRounds + ceasarRounds;
+
+
+        byte[] data = sData.getBytes(StandardCharsets.UTF_8);
+        byte[] key = sKey.getBytes(StandardCharsets.UTF_8);
+
         data = Base64.getDecoder().decode(data);
 
-        while(roundsLeft > 0) {
+        for (String operation : config) {
 
-            if (ceasarRounds > 0) {
-                data = CryptoUtils.ceasarEncryption(data, ceasarShift);
-                ceasarRounds--;
-                roundsLeft--;
-
-            }
-
-            if (vignereRounds > 0) {
-                data = CryptoUtils.vigenereEncryption(data, key);
-                vignereRounds--;
-                roundsLeft--;
-
-            }
-
-            if (xorRounds > 0) {
+            if (operation.equals("X")) {
                 data = CryptoUtils.XOREncryption(data, key);
-                xorRounds--;
-                roundsLeft--;
-
             }
 
+            else if (operation.equals("V")) {
+                data = CryptoUtils.vigenereDecryption(data, key);
+            }
+
+            else if (operation.startsWith("C")) {
+                String shiftText = operation.substring(1);
+                int shift = Integer.parseInt(shiftText);
+
+                data = CryptoUtils.ceasarDecryption(data, shift);
+            }
         }
 
-        String result = data.toString();
+        String result = new String(data, StandardCharsets.UTF_8);
         return result;
     }
 }
