@@ -33,7 +33,7 @@ public class DecryptTab {
         runButton.addActionListener(e -> {
             consoleOutputField.setText("");
 
-            consoleOutputField.append("\nConfig detected: " + configInputField.getText() + "\n" );
+            consoleOutputField.append("Config detected: " + configInputField.getText() + "\n" );
             List<String> parsedConfig = parseConfig(configInputField.getText());
             consoleOutputField.append("Config parsed: " + parsedConfig + "\n");
             Collections.reverse(parsedConfig);
@@ -41,6 +41,8 @@ public class DecryptTab {
 
             String result = CryptoUtils.decrypt(encryptedTextInputField.getText(), keyInputField.getText(), parsedConfig);
             decryptedTextOutputField.setText(result);
+
+            consoleOutputField.append("Decryption finished!");
 
         });
 

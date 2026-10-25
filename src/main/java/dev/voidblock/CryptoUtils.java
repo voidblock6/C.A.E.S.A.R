@@ -1,7 +1,7 @@
 package dev.voidblock;
 
-import java.lang.management.OperatingSystemMXBean;
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.util.*;
 
 public class CryptoUtils {
@@ -10,14 +10,14 @@ public class CryptoUtils {
     public static String generateRandomKey(int length) {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890!@#$%^&*()`~_-=+[{]}/?.>,<";
         StringBuilder keygen = new StringBuilder();
-        Random random = new Random();
+        SecureRandom random = new SecureRandom();
         for (int i = 0; i < length; i++) {
             keygen.append(chars.charAt(random.nextInt(chars.length())));
         }
         return keygen.toString();
     }
 
-    //XOR encryption
+    //XOR de/encryption
     public static byte[] XOREncryption(byte[] data, byte[] key) {
         byte[] result = new byte[data.length];
 
@@ -30,8 +30,8 @@ public class CryptoUtils {
         return result;
     }
 
-    //Vigenère Chiper Encryption
-    public static byte[] vigenereEncryption(byte[] data, byte[] key) {
+    //Byte Vigenère Chiper Encryption
+    public static byte[] byteVigenereEncryption(byte[] data, byte[] key) {
         byte[] result = new byte[data.length];
 
         for (int i = 0; i < data.length; i++) {
@@ -51,7 +51,8 @@ public class CryptoUtils {
         return result;
     }
 
-    public static byte[] ceasarEncryption(byte[] data, int shift) {
+    //Byte ceasar chiper encryption
+    public static byte[] byteCeasarEncryption(byte[] data, int shift) {
         byte[] result = new byte[data.length];
         for (int i = 0; i < data.length; i++) {
             int val = data[i] & 0xFF;
@@ -62,6 +63,7 @@ public class CryptoUtils {
         return result;
     }
 
+    //encrypt
     public static EncryptionResult encrypt(byte[] data, byte[] key, int xorRounds, int vignereRounds, int ceasarRounds, int ceasarShift) {
         List<String> operationOrder = new ArrayList<>();
         int roundsLeft = xorRounds + vignereRounds + ceasarRounds;
@@ -77,14 +79,14 @@ public class CryptoUtils {
             }
 
             if (vignereRounds > 0) {
-                data = CryptoUtils.vigenereEncryption(data, key);
+                data = CryptoUtils.byteVigenereEncryption(data, key);
                 vignereRounds--;
                 roundsLeft--;
                 operationOrder.add("V");
             }
 
             if (ceasarRounds > 0) {
-                data = CryptoUtils.ceasarEncryption(data, ceasarShift);
+                data = CryptoUtils.byteCeasarEncryption(data, ceasarShift);
                 ceasarRounds--;
                 roundsLeft--;
                 operationOrder.add("C" + String.format("%03d", ceasarShift));
@@ -157,8 +159,8 @@ public class CryptoUtils {
         return operationOrder;
     }
 
-
-    public static byte[] ceasarDecryption(byte[] data, int shift) {
+    //byte ceasar decryption
+    public static byte[] byteCeasarDecryption(byte[] data, int shift) {
         byte[] result = new byte[data.length];
         for (int i = 0; i < data.length; i++) {
             int val = data[i] & 0xFF;
@@ -169,7 +171,8 @@ public class CryptoUtils {
         return result;
     }
 
-    public static byte[] vigenereDecryption(byte[] data, byte[] key) {
+    //byte vignere decryption
+    public static byte[] byteVigenereDecryption(byte[] data, byte[] key) {
         byte[] result = new byte[data.length];
 
         for (int i = 0; i < data.length; i++) {
@@ -207,14 +210,14 @@ public class CryptoUtils {
             }
 
             else if (operation.equals("V")) {
-                data = CryptoUtils.vigenereDecryption(data, key);
+                data = CryptoUtils.byteVigenereDecryption(data, key);
             }
 
             else if (operation.startsWith("C")) {
                 String shiftText = operation.substring(1);
                 int shift = Integer.parseInt(shiftText);
 
-                data = CryptoUtils.ceasarDecryption(data, shift);
+                data = CryptoUtils.byteCeasarDecryption(data, shift);
             }
         }
 
