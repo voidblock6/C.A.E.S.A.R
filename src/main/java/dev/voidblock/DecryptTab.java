@@ -42,7 +42,7 @@ public class DecryptTab {
             String result = CryptoUtils.decrypt(encryptedTextInputField.getText(), keyInputField.getText(), parsedConfig);
             decryptedTextOutputField.setText(result);
 
-            consoleOutputField.append("Decryption finished!");
+
 
         });
 
