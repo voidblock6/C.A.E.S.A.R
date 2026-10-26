@@ -4,6 +4,7 @@ import java.awt.*;
 import java.nio.charset.StandardCharsets;
 
 import static dev.voidblock.CryptoUtils.encrypt;
+import static dev.voidblock.UiUtils.defaultEncryptUI;
 import static dev.voidblock.UiUtils.toggleVisibilityOnCheck;
 
 
@@ -29,13 +30,7 @@ public class EncryptTab {
 
 
             //XOR
-            JLabel xorRoundsLabel = new JLabel("XOR Rounds:");
-            JSlider xorRoundsSlider = new JSlider(0, 10, 0);
-            xorRoundsSlider.setMajorTickSpacing(1);
-            xorRoundsSlider.setPaintTicks(true);
-            xorRoundsSlider.setPaintLabels(true);
-
-
+           JPanel XORPanel = defaultEncryptUI("XOR Rounds:", "XOR",1, 99, 1);
 
 
             //Vignére
@@ -85,7 +80,7 @@ public class EncryptTab {
                 byte[] encryptedRaw = inputField.getText().getBytes(StandardCharsets.UTF_8);
 
 
-                int xorRounds = xorRoundsSlider.getValue();
+                int xorRounds = XOR.getValue();
                 int vignereRounds = vignereRoundsSlider.getValue();
                 int caesarRounds = caesarRoundsSlider.getValue();
                 int shift = (int) caesarShiftSpinner.getValue();
@@ -101,8 +96,7 @@ public class EncryptTab {
             // Sidebar
             JPanel Sidebar = new JPanel((new GridLayout(0, 1, 0, 10)));
 
-            Sidebar.add(xorRoundsLabel, BorderLayout.NORTH);
-            Sidebar.add(xorRoundsSlider, BorderLayout.CENTER);
+            Sidebar.add(XORPanel);
 
             Sidebar.add(vignereRoundsLabel);
             Sidebar.add(vignereRoundsSlider);

@@ -30,7 +30,7 @@ This project is very much still a work in progress.
 * Config and key generation
 
 **Work in progress and planned features:**
-* Decryption
+* 
 * Presets
 * Salts
 * Morse code encryption/decryption

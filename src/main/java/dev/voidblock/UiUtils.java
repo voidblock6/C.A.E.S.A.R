@@ -21,5 +21,17 @@ public class UiUtils {
         });
     }
 
+    public static JPanel defaultEncryptUI(String Label, String JPanelName, int min, int max, int stepSize) {
+        JLabel encryptLabel = new JLabel(Label);
+        SpinnerNumberModel shiftModel = new SpinnerNumberModel(min, min, max, stepSize);
+        JSpinner encrypSpinner = new JSpinner(shiftModel);
+
+        JPanel encryptPanel = new JPanel((new GridLayout(0, 1, 0, 1)));
+        encryptPanel.add(encryptLabel);
+        encryptPanel.add(encrypSpinner);
+
+        return encryptPanel;
+
+    }
 
 }
