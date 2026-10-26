@@ -30,6 +30,33 @@ public class CryptoUtils {
         return result;
     }
 
+    public static byte[] atbashEncryption(byte[] data, boolean transformNumbers) {
+        byte[] result = new byte[data.length];
+        for (int i = 0; i < data.length; i++) {
+
+            if (data[i] >= 'A' && data[i] <= 'Z') {
+
+                int position = data[i] - 'A';
+                int reversedPosition = 25 - position;
+                result[i] = (byte) ('A' + reversedPosition);
+            }
+            else if (data[i] >= 'a' && data[i] <= 'z') {
+                int position = data[i] - 'a';
+                int reversedPosition = 25 - position;
+                result[i] = (byte) ('a' + reversedPosition);
+
+            } else if (transformNumbers && data[i] >= '0' && data[i] <= '9') {
+                int position = data[i] - '0';
+                int reversedPosition = 9 - position;
+                result[i] = (byte) ('0' + reversedPosition);
+            } else {
+            result[i] = data[i];
+            }
+        }
+
+        return result;
+    }
+
     //Byte Vigenère Chiper Encryption
     public static byte[] byteVigenereEncryption(byte[] data, byte[] key) {
         byte[] result = new byte[data.length];
@@ -64,9 +91,9 @@ public class CryptoUtils {
     }
 
     //encrypt
-    public static EncryptionResult encrypt(byte[] data, byte[] key, int xorRounds, int vignereRounds, int ceasarRounds, int ceasarShift) {
+    public static EncryptionResult encrypt(byte[] data, byte[] key, int xorRounds, int vignereRounds, int ceasarRounds, int ceasarShift, int atbashRounds, boolean atbashTransformNumbers) {
         List<String> operationOrder = new ArrayList<>();
-        int roundsLeft = xorRounds + vignereRounds + ceasarRounds;
+        int roundsLeft = xorRounds + vignereRounds + ceasarRounds + atbashRounds;
 
         while(roundsLeft > 0) {
 
@@ -90,6 +117,14 @@ public class CryptoUtils {
                 ceasarRounds--;
                 roundsLeft--;
                 operationOrder.add("C" + String.format("%03d", ceasarShift));
+            }
+
+            if (atbashRounds > 0) {
+                data = CryptoUtils.atbashEncryption(data, atbashTransformNumbers);
+                atbashRounds--;
+                roundsLeft--;
+                operationOrder.add("A" + (atbashTransformNumbers ? "1" : "0"));
+
             }
         }
         String result = Base64.getEncoder().encodeToString(data);
@@ -150,7 +185,14 @@ public class CryptoUtils {
                 operationOrder.add("C" + shiftDigits);
                 i += 4;
 
+            }
+            else if (current == 'A') {
+                String option = config.substring(i + 1, i + 2);
+                boolean atbashTransformNumbers = option.equals("1");
+                operationOrder.add("A" + (atbashTransformNumbers ? "1" : "0"));
+                i += 2;
             } else {
+
                 operationOrder.add(String.valueOf(current));
                 i += 1;
             }
@@ -219,6 +261,14 @@ public class CryptoUtils {
 
                 data = CryptoUtils.byteCeasarDecryption(data, shift);
             }
+
+            else if (operation.startsWith("A")) {
+                char option = operation.charAt(1);
+                boolean transformNumbers = option == '1';
+                data = CryptoUtils.atbashEncryption(data,transformNumbers);
+            }
+
+
         }
 
         String result = new String(data, StandardCharsets.UTF_8);

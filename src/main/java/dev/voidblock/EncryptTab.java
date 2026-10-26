@@ -31,13 +31,20 @@ public class EncryptTab {
         //Sidebar
 
         //XOR
-        UiUtils.spinnerPanel XORPanel = defaultEncryptUI("XOR encyption", "XOR Rounds:", 0, 99, 1);
+        UiUtils.spinnerPanel XORPanel = defaultEncryptUI("XOR encyption", "XOR rounds:", 0, 99, 1);
 
         //Vignére
         UiUtils.spinnerPanel vignerePanel = defaultEncryptUI("Vignere chiper", "Vignere rounds:", 0, 99, 1);
 
         //Caesar
         UiUtils.DoubleSpinnerPanel caesarPanel = doubleSpinnerEncryptUI("Caesar chiper", "Caesar rounds:", "Caesar shift:", 0, 99, 1, 0, 255, 1);
+
+        //Atbash
+        UiUtils.spinnerPanel atbashPanel = defaultEncryptUI("Atbash chiper:", "Atbash rounds:", 0, 99, 1);
+        JLabel transformNumbersLabel = new JLabel("Transform numbers:");
+        JCheckBox  transformNumberButton = new JCheckBox();
+
+
 
         //Key length
         JLabel keyLengthLabel = new JLabel("Key Length (8-64): 32");
@@ -69,9 +76,11 @@ public class EncryptTab {
             int vignereRounds = (int) vignerePanel.spinner.getValue();
             int caesarRounds = (int) caesarPanel.spinner1.getValue();
             int shift = (int) caesarPanel.spinner2.getValue();
+            int atbashRounds = (int) atbashPanel.spinner.getValue();
+            boolean transformNumbers = (boolean) transformNumberButton.isSelected();
 
             //encrypt
-            CryptoUtils.EncryptionResult result = encrypt(encryptedRaw, keyBytes, XORRounds, vignereRounds, caesarRounds, shift);
+            CryptoUtils.EncryptionResult result = encrypt(encryptedRaw, keyBytes, XORRounds, vignereRounds, caesarRounds, shift,atbashRounds, transformNumbers);
             String finalData = result.data;
             String config = String.join("", result.operationOrder);
 
@@ -87,6 +96,9 @@ public class EncryptTab {
         sidebar.add((JPanel) XORPanel.panel);
         sidebar.add((JPanel) vignerePanel.panel);
         sidebar.add((JPanel) caesarPanel.panel);
+        sidebar.add((JPanel) atbashPanel.panel);
+        sidebar.add(transformNumbersLabel);
+        sidebar.add(transformNumberButton);
 
         // text areas
         JPanel textPanel = new JPanel(new GridLayout(1, 2, 10, 0));
