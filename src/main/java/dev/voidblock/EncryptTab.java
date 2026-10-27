@@ -44,6 +44,10 @@ public class EncryptTab {
         JLabel transformNumbersLabel = new JLabel("Transform numbers:");
         JCheckBox  transformNumberButton = new JCheckBox();
 
+        //Base64
+        UiUtils.DoubleSpinnerPanel basePanel = doubleSpinnerEncryptUI("Base conversion", "Base conversion rounds:", "Base", 0, 99, 1, 64, 64, 64);
+
+
 
 
         //Key length
@@ -78,9 +82,11 @@ public class EncryptTab {
             int shift = (int) caesarPanel.spinner2.getValue();
             int atbashRounds = (int) atbashPanel.spinner.getValue();
             boolean transformNumbers = (boolean) transformNumberButton.isSelected();
+            int baseRounds = (int) basePanel.spinner1.getValue();
+            int base = (int) basePanel.spinner2.getValue();
 
             //encrypt
-            CryptoUtils.EncryptionResult result = encrypt(encryptedRaw, keyBytes, XORRounds, vignereRounds, caesarRounds, shift,atbashRounds, transformNumbers);
+            CryptoUtils.EncryptionResult result = encrypt(encryptedRaw, keyBytes, XORRounds, vignereRounds, caesarRounds, shift,atbashRounds, transformNumbers, baseRounds, base);
             String finalData = result.data;
             String config = String.join("", result.operationOrder);
 
@@ -99,6 +105,8 @@ public class EncryptTab {
         sidebar.add((JPanel) atbashPanel.panel);
         sidebar.add(transformNumbersLabel);
         sidebar.add(transformNumberButton);
+        sidebar.add((JPanel) basePanel.panel);
+
 
         // text areas
         JPanel textPanel = new JPanel(new GridLayout(1, 2, 10, 0));

@@ -30,6 +30,7 @@ public class CryptoUtils {
         return result;
     }
 
+    //atbash chiper encryption/decryption
     public static byte[] atbashEncryption(byte[] data, boolean transformNumbers) {
         byte[] result = new byte[data.length];
         for (int i = 0; i < data.length; i++) {
@@ -90,10 +91,26 @@ public class CryptoUtils {
         return result;
     }
 
+    //Base conversion encryption.
+    public static byte[] baseConversion(byte[] data, int base) {
+        byte[] result;
+
+        if (base == 64) {
+            result = Base64.getEncoder().encode(data);
+        } else
+        {
+            result = data;
+        }
+
+        return result;
+    }
+
+
+
     //encrypt
-    public static EncryptionResult encrypt(byte[] data, byte[] key, int xorRounds, int vignereRounds, int ceasarRounds, int ceasarShift, int atbashRounds, boolean atbashTransformNumbers) {
+    public static EncryptionResult encrypt(byte[] data, byte[] key, int xorRounds, int vignereRounds, int ceasarRounds, int ceasarShift, int atbashRounds, boolean atbashTransformNumbers, int baseRounds, int base) {
         List<String> operationOrder = new ArrayList<>();
-        int roundsLeft = xorRounds + vignereRounds + ceasarRounds + atbashRounds;
+        int roundsLeft = xorRounds + vignereRounds + ceasarRounds + atbashRounds + baseRounds;
 
         while(roundsLeft > 0) {
 
@@ -126,41 +143,20 @@ public class CryptoUtils {
                 operationOrder.add("A" + (atbashTransformNumbers ? "1" : "0"));
 
             }
+
+            if (baseRounds > 0) {
+                data = CryptoUtils.baseConversion(data, base);
+                baseRounds--;
+                roundsLeft--;
+                operationOrder.add("B" + base);
+            }
         }
-        String result = Base64.getEncoder().encodeToString(data);
-       return new EncryptionResult(result, operationOrder);
+
+        return new EncryptionResult(
+                new String(data, StandardCharsets.UTF_8),
+                operationOrder
+        );
     }
-
-
-
-
-
-    //salts encryption
-    /*
-    public static String saltsEncryption(byte[] data, int amount) {
-        List<Integer> positions = new ArrayList<>();
-        for (int i = 0; i < data.length; i++) {
-            positions.add(i);
-        }
-        Collections.shuffle(positions);
-
-        StringBuilder saltInfo = new StringBuilder();
-        Random rand = new Random();
-
-        for (int i = 0; i < amount; i++) {
-            int pos = positions.get(i);
-            byte originalByte = data[pos];
-
-            // %03d for the byte (0-255), %04d for the position
-            saltInfo.append(String.format("%03d%04d", (originalByte & 0xFF), pos));
-            // Overwrite a byte in the text with a random byte
-            data[pos] = (byte) rand.nextInt(256);
-        }
-        return saltInfo.toString();
-    }
-
-     */
-
 
     public static class EncryptionResult {
         public String data;
@@ -191,8 +187,16 @@ public class CryptoUtils {
                 boolean atbashTransformNumbers = option.equals("1");
                 operationOrder.add("A" + (atbashTransformNumbers ? "1" : "0"));
                 i += 2;
-            } else {
 
+            } else if (current == 'B') {
+                String base = config.substring(i + 1, i + 3);
+                operationOrder.add("B" + base);
+                i += 3;
+
+            } else
+
+
+            {
                 operationOrder.add(String.valueOf(current));
                 i += 1;
             }
@@ -233,21 +237,45 @@ public class CryptoUtils {
         return result;
     }
 
+    //base deconversion
+    public static byte[] baseDeConversion(byte[] data, int base) {
+        byte[] result;
+
+        if (base == 64) {
+            result = Base64.getDecoder().decode(data);
+        } else
+        {
+            result = data;
+        }
+
+        return result;
+    }
+
 
 
 
     public static String decrypt(String sData, String sKey, List<String> config) {
         List<String> operationOrder = new ArrayList<>();
 
-
         byte[] data = sData.getBytes(StandardCharsets.UTF_8);
         byte[] key = sKey.getBytes(StandardCharsets.UTF_8);
 
-        data = Base64.getDecoder().decode(data);
-
         for (String operation : config) {
 
-            if (operation.equals("X")) {
+
+            if (operation.startsWith("B")) {
+                String option = operation.substring(1);
+                int base = Integer.parseInt(option);
+                data = baseDeConversion(data, base);
+
+            } else if (operation.startsWith("A")) {
+                char option = operation.charAt(1);
+                boolean transformNumbers = option == '1';
+                data = CryptoUtils.atbashEncryption(data,transformNumbers);
+
+            }
+
+            else if (operation.equals("X")) {
                 data = CryptoUtils.XOREncryption(data, key);
             }
 
@@ -261,13 +289,6 @@ public class CryptoUtils {
 
                 data = CryptoUtils.byteCeasarDecryption(data, shift);
             }
-
-            else if (operation.startsWith("A")) {
-                char option = operation.charAt(1);
-                boolean transformNumbers = option == '1';
-                data = CryptoUtils.atbashEncryption(data,transformNumbers);
-            }
-
 
         }
 
